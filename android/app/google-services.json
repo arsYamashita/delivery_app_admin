@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "158728980101",
+    "project_id": "deliveryapptest-18806",
+    "storage_bucket": "deliveryapptest-18806.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158728980101:android:4dbabff177ace2c1c4cbec",
+        "android_client_info": {
+          "package_name": "com.arscube.delivery_app_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB47KeXgjkFKQhNAhC7Od74g7bCyfpUKEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
