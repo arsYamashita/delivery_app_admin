@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserScreen extends StatefulWidget {
@@ -15,20 +14,9 @@ class _UserScreenState extends State<UserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('ユーザー画面'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pop(context); // ログイン画面に戻る
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -56,15 +44,21 @@ class _UserScreenState extends State<UserScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
-                  .where('driver_id', isGreaterThanOrEqualTo: _searchQuery)
-                  .where('driver_id', isLessThan: '$_searchQuery\uf8ff')
+                  .orderBy('driver_id')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final users = snapshot.data!.docs;
+                final users = snapshot.data!.docs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return data['driver_id']?.toString().contains(_searchQuery) == true ||
+                      data['driver_name']?.toString().contains(_searchQuery) == true ||
+                      data['company_code']?.toString().contains(_searchQuery) == true ||
+                      data['company_name']?.toString().contains(_searchQuery) == true;
+                }).toList();
+
                 if (users.isEmpty) {
                   return const Center(child: Text('ユーザーが見つかりません'));
                 }
@@ -74,19 +68,35 @@ class _UserScreenState extends State<UserScreen> {
                   itemBuilder: (context, index) {
                     final userDoc = users[index];
                     return ListTile(
-                      title: Text(userDoc['driver_id']),
+                      title: Text(userDoc['driver_id'] ?? '不明'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '運転手: ${(userDoc.data() as Map<String, dynamic>?)?['driver_name'] ?? '未登録'}',
+                          ),
+                          Text(
+                            '運送会社コード: ${(userDoc.data() as Map<String, dynamic>?)?['company_code'] ?? '未登録'}',
+                          ),
+                          Text(
+                            '運送会社名: ${(userDoc.data() as Map<String, dynamic>?)?['company_name'] ?? '未登録'}',
+                          ),
+                        ],
+                      ),
                       trailing: PopupMenuButton<String>(
                         onSelected: (value) {
-                          if (value == 'reset') {
-                            _resetPassword(userDoc['driver_id']);
+                          if (value == 'show_password') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('パスワード: ${userDoc['password'] ?? '不明'}')),
+                            );
                           } else if (value == 'delete') {
                             _deleteUser(userDoc.id);
                           }
                         },
                         itemBuilder: (context) => [
                           const PopupMenuItem(
-                            value: 'reset',
-                            child: Text('パスワードリセット'),
+                            value: 'show_password',
+                            child: Text('パスワード表示'),
                           ),
                           const PopupMenuItem(
                             value: 'delete',
@@ -113,24 +123,28 @@ class _UserScreenState extends State<UserScreen> {
     );
   }
 
-  void _resetPassword(String email) async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$email にパスワードリセットメールを送信しました')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('エラー: $e')),
-      );
-    }
+  void _showPassword(String password) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('パスワード'),
+        content: Text(password),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('閉じる'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _deleteUser(String userId) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(userId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ユーザーを削除しました')));
+        const SnackBar(content: Text('ユーザーを削除しました')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('エラー: $e')),
@@ -139,26 +153,44 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   void _showAddUserDialog() {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController nameController = TextEditingController();
+    final TextEditingController driverIdController = TextEditingController();
+    final TextEditingController driverNameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController companyCodeController = TextEditingController();
+    final TextEditingController companyNameController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('ユーザー登録'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'driver_id'),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: 'password'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: driverIdController,
+                  decoration: const InputDecoration(labelText: 'ドライバーID'),
+                ),
+                TextField(
+                  controller: driverNameController,
+                  decoration: const InputDecoration(labelText: '運転手'),
+                ),
+                TextField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(labelText: 'パスワード'),
+                  obscureText: true,
+                ),
+                TextField(
+                  controller: companyCodeController,
+                  decoration: const InputDecoration(labelText: '運送会社コード'),
+                ),
+                TextField(
+                  controller: companyNameController,
+                  decoration: const InputDecoration(labelText: '運送会社名'),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -169,8 +201,11 @@ class _UserScreenState extends State<UserScreen> {
               onPressed: () async {
                 try {
                   await FirebaseFirestore.instance.collection('users').add({
-                    'password': emailController.text.trim(),
-                    'driver_id': nameController.text.trim(),
+                    'driver_id': driverIdController.text.trim(),
+                    'driver_name': driverNameController.text.trim(),
+                    'password': passwordController.text.trim(),
+                    'company_code': companyCodeController.text.trim(),
+                    'company_name': companyNameController.text.trim(),
                   });
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
