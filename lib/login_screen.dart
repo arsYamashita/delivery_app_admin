@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'user_screen.dart';
-
+import 'selection_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // ログイン成功時、ユーザー画面に遷移
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const UserScreen()),
+        MaterialPageRoute(builder: (context) => const SelectionScreen()),
       );
     } catch (e) {
       // エラーを表示
@@ -63,4 +63,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

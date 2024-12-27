@@ -17,6 +17,12 @@ class _UserScreenState extends State<UserScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ユーザー画面'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // 一つ前の画面に戻る
+          },
+        ),
       ),
       body: Column(
         children: [
