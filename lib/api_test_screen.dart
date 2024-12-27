@@ -41,6 +41,83 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
     }
   }
 
+  // API にデータを送信
+  Future<void> setOrders() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final ordersData = [
+      {
+        "orderCode": "123456789",
+        "barcodes": ["1111111111", "2222222222", "3333333333"],
+        "packageName": "コンテナ",
+        "storeName": "店舗1",
+        "storeId": "0001"
+      },
+      {
+        "orderCode": "123456789",
+        "barcodes": ["1111111111", "2222222222"],
+        "packageName": "オリコン",
+        "storeName": "店舗1",
+        "storeId": "0001"
+      },
+      {
+        "orderCode": "123456789",
+        "barcodes": ["1111111111", "2222222222"],
+        "packageName": "コンテナ",
+        "storeName": "店舗2",
+        "storeId": "0002"
+      },
+      {
+        "orderCode": "987654321",
+        "barcodes": ["1111111111", "2222222222", "3333333333"],
+        "packageName": "コンテナ",
+        "storeName": "店舗3",
+        "storeId": "0003"
+      },
+      {
+        "orderCode": "987654321",
+        "barcodes": ["1111111111", "2222222222"],
+        "packageName": "オリコン",
+        "storeName": "店舗3",
+        "storeId": "0003"
+      },
+      {
+        "orderCode": "987654321",
+        "barcodes": ["1111111111", "2222222222"],
+        "packageName": "コンテナ",
+        "storeName": "店舗4",
+        "storeId": "0004"
+      }
+    ];
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://us-central1-deliveryapptest-18806.cloudfunctions.net/createOrders'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(ordersData),
+      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("データが正常に登録されました")),
+        );
+      } else {
+        throw Exception("Failed to set orders");
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("エラー: $e")),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   // TimestampをDateTimeに変換するヘルパー関数
   DateTime? convertTimestamp(Map<String, dynamic>? timestamp) {
     if (timestamp == null) return null;
@@ -62,9 +139,18 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
           // APIを呼び出すボタン
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: fetchOrders,
-              child: const Text('Get Orders'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: fetchOrders,
+                  child: const Text('Get Orders'),
+                ),
+                ElevatedButton(
+                  onPressed: setOrders,
+                  child: const Text('Set Orders'),
+                ),
+              ],
             ),
           ),
           // ローディング中の場合
