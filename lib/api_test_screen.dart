@@ -49,43 +49,43 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
 
     final ordersData = [
       {
-        "orderCode": "123456789",
-        "barcodes": ["1111111111", "2222222222", "3333333333"],
+        "orderCode": "2024121900010001",
+        "barcodes": ["000001", "000002", "000003"],
         "packageName": "コンテナ",
         "storeName": "店舗1",
         "storeId": "0001"
       },
       {
-        "orderCode": "123456789",
-        "barcodes": ["1111111111", "2222222222"],
+        "orderCode": "2024121900010001",
+        "barcodes": ["000001", "000002"],
         "packageName": "オリコン",
         "storeName": "店舗1",
         "storeId": "0001"
       },
       {
-        "orderCode": "123456789",
-        "barcodes": ["1111111111", "2222222222"],
+        "orderCode": "2024121900010001",
+        "barcodes": ["000001", "000002"],
         "packageName": "コンテナ",
         "storeName": "店舗2",
         "storeId": "0002"
       },
       {
-        "orderCode": "987654321",
-        "barcodes": ["1111111111", "2222222222", "3333333333"],
+        "orderCode": "2024121900010002",
+        "barcodes":  ["000001", "000002", "000003"],
         "packageName": "コンテナ",
         "storeName": "店舗3",
         "storeId": "0003"
       },
       {
-        "orderCode": "987654321",
-        "barcodes": ["1111111111", "2222222222"],
+        "orderCode": "2024121900010002",
+        "barcodes": ["000001", "000002"],
         "packageName": "オリコン",
         "storeName": "店舗3",
         "storeId": "0003"
       },
       {
-        "orderCode": "987654321",
-        "barcodes": ["1111111111", "2222222222"],
+        "orderCode": "2024121900010002",
+        "barcodes": ["000001", "000002"],
         "packageName": "コンテナ",
         "storeName": "店舗4",
         "storeId": "0004"
