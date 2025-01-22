@@ -49,42 +49,36 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
 
     final ordersData = [
       {
-        "orderCode": "2024121900010001",
         "barcodes": ["000001", "000002", "000003"],
         "packageName": "コンテナ",
         "storeName": "店舗1",
         "storeId": "0001"
       },
       {
-        "orderCode": "2024121900010001",
         "barcodes": ["000001", "000002"],
         "packageName": "オリコン",
         "storeName": "店舗1",
         "storeId": "0001"
       },
       {
-        "orderCode": "2024121900010001",
         "barcodes": ["000001", "000002"],
         "packageName": "コンテナ",
         "storeName": "店舗2",
         "storeId": "0002"
       },
       {
-        "orderCode": "2024121900010002",
         "barcodes":  ["000001", "000002", "000003"],
         "packageName": "コンテナ",
         "storeName": "店舗3",
         "storeId": "0003"
       },
       {
-        "orderCode": "2024121900010002",
         "barcodes": ["000001", "000002"],
         "packageName": "オリコン",
         "storeName": "店舗3",
         "storeId": "0003"
       },
       {
-        "orderCode": "2024121900010002",
         "barcodes": ["000001", "000002"],
         "packageName": "コンテナ",
         "storeName": "店舗4",
@@ -167,11 +161,10 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                 itemBuilder: (context, index) {
                   final order = orders[index];
                   return ListTile(
-                    title: Text('Order ID: ${order['id'] ?? '不明'}'),
+                    title: Text('Store Name: ${order['storeName'] ?? '不明'}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Order Code: ${order['orderCode'] ?? '不明'}'),
                         Text('Package Name: ${order['packageName'] ?? '不明'}'),
                         Text('Quantity: ${order['quantity'] ?? 0}'),
                         Text('Status: ${order['status'] ?? '不明'}'),
